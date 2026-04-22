@@ -36,6 +36,11 @@ export default async function PlayerPage({ params }: PageProps) {
   const losses = Math.max(0, totalGames - wins);
   const winRate = totalGames ? wins / totalGames : 0;
 
+  const sumK = rows.reduce((s, r) => s + r.kills, 0);
+  const sumD = rows.reduce((s, r) => s + r.deaths, 0);
+  const sumA = rows.reduce((s, r) => s + r.assists, 0);
+  const overallKda = sumD > 0 ? (sumK + sumA) / sumD : sumK + sumA;
+
   const uniqueChamps = [
     ...new Set(rows.map((r) => r.champion.trim()).filter(Boolean)),
   ];
@@ -65,6 +70,7 @@ export default async function PlayerPage({ params }: PageProps) {
         wins={wins}
         losses={losses}
         winRate={winRate}
+        overallKda={overallKda}
       />
 
       <PlayerChampionSection

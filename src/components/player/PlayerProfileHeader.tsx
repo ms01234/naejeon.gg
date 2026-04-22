@@ -10,6 +10,8 @@ type Props = {
   wins: number;
   losses: number;
   winRate: number;
+  /** 통산 (K+A)/D, D=0이면 K+A */
+  overallKda: number;
 };
 
 export function PlayerProfileHeader({
@@ -19,6 +21,7 @@ export function PlayerProfileHeader({
   wins,
   losses,
   winRate,
+  overallKda,
 }: Props) {
   return (
     <header className={playerProfileCardClass(hofRank)}>
@@ -46,6 +49,11 @@ export function PlayerProfileHeader({
           승률{" "}
           <strong className="tabular-nums text-[var(--op-blue-bright)]">
             {(winRate * 100).toFixed(1)}%
+          </strong>
+          {" · "}
+          KDA{" "}
+          <strong className="tabular-nums text-[var(--op-text)]">
+            {Number.isFinite(overallKda) ? overallKda.toFixed(2) : "—"}
           </strong>
         </span>
       </div>
