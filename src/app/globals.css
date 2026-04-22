@@ -1,0 +1,48 @@
+@import "tailwindcss";
+@config "../../tailwind.config.js";
+
+/*
+ * 색 토큰 — 컴포넌트에서는 var(--op-*) 만 사용 (하드코드 # 제거).
+ * - page: 전역 배경
+ * - surface: 매치 카드·카드형 섹션 면 (#252529, 배경보다 살짝 밝게)
+ * - surface-header-from: 매치 카드 헤더 그라데이션 시작
+ * - panel: 검색·빈 상태 패널
+ * - text: 본문 (#E2E8F0)
+ */
+:root {
+  --op-page: #1c1c1f;
+  --op-panel: #31313c;
+  --op-bg: #1e1e22;
+  --op-surface: #252529;
+  --op-surface-header-from: #222225;
+  --op-elevated: #323238;
+  --op-border: rgb(255 255 255 / 0.06);
+  --op-input: #2a2a2f;
+  --op-text: #e2e8f0;
+  --op-muted: #94a3b8;
+  --op-accent: #3b82f6;
+  --op-accent-bright: #60a5fa;
+  --op-blue: #2563eb;
+  --op-blue-bright: #93c5fd;
+  --op-red: #e11d48;
+  --op-red-bright: #fb7185;
+  --op-logo-box: #2563eb;
+}
+
+@theme inline {
+  --font-sans: "Pretendard GOV", "Pretendard", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--op-page);
+  color: var(--op-text);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  line-height: 1.625;
+}
