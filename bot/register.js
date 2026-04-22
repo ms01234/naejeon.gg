@@ -64,7 +64,7 @@ async function main() {
     console.log("✓ 전역으로 /기록(record), /전적삭제(match_delete) 명령을 등록했습니다.");
   }
   console.log("  /기록: [블루팀 입력] [레드팀 입력] [최종 저장] 패널");
-  console.log("  /전적삭제: match_id — 관리자 또는 DISCORD_MATCH_DELETE_ROLE_ID");
+  console.log("  /기록·/전적삭제·패널: 서버 역할 이름 '관리자' 또는 Discord Administrator 만 사용 가능");
 }
 
 main().catch((e) => {
