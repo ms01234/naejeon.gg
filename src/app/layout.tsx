@@ -9,45 +9,28 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
   "http://localhost:3000";
 
-/**
- * 브라우저가 파비콘을 오래 캐시합니다. `src/app/favicon.ico` 교체 후에도 예전 아이콘이면
- * 이 값만 올려서 새 URL로 강제 갱신하세요. (예: ?v=1 → ?v=2)
- */
-const ICON_CACHE_BUST = "1";
-
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "내전.GG",
-  description: "5대5 내전 전적 · OP.GG 스타일",
+  title: "내전.gg",
+  description: "우리들만의 명예의 전당",
   icons: {
     icon: [
       {
-        url: `/favicon.ico?v=${ICON_CACHE_BUST}`,
-        sizes: "any",
-      },
-      {
-        url: `/naejeon.png?v=${ICON_CACHE_BUST}`,
-        type: "image/png",
-        sizes: "512x512",
-      },
-    ],
-    shortcut: [{ url: `/favicon.ico?v=${ICON_CACHE_BUST}` }],
-    apple: [
-      {
-        url: `/naejeon.png?v=${ICON_CACHE_BUST}`,
-        type: "image/png",
+        // 파일명을 바꾸고 버전을 붙여서 새 파일임을 알림
+        url: "/icon.png?v=1",
+        href: "/icon.png?v=1",
       },
     ],
   },
   openGraph: {
-    title: "내전.GG",
-    description: "5대5 내전 전적 · OP.GG 스타일",
-    images: [{ url: "/naejeon.png", width: 512, height: 512, alt: "내전.GG" }],
+    title: "내전.gg",
+    description: "우리들만의 명예의 전당",
+    images: [{ url: "/naejeon.png", width: 512, height: 512, alt: "내전.gg" }],
   },
   twitter: {
     card: "summary",
-    title: "내전.GG",
-    description: "5대5 내전 전적 · OP.GG 스타일",
+    title: "내전.gg",
+    description: "우리들만의 명예의 전당",
     images: ["/naejeon.png"],
   },
 };
