@@ -9,48 +9,30 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
   "https://naejeon-gg.vercel.app";
 
-const ogImageAbs = `${siteUrl}/og-image.png?v=6`;
+const ogImageAbs = `${siteUrl}/og-image.png?v=7`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "내전.gg",
-  description: "내전 전적 사이트",
+  title: "내전.GG",
+  description: "",
   icons: {
-    icon: [
-      { url: "/icon.png?v=2", href: "/icon.png?v=2" },
-      { url: "/favicon.ico?v=2", href: "/favicon.ico?v=2" },
-    ],
-    apple: "/icon.png?v=2",
+    icon: "/icon.png?v=7",
   },
   openGraph: {
-    title: "내전.gg",
-    description: "내전 전적 사이트",
+    title: "내전.GG",
+    description: "",
     url: siteUrl,
-    siteName: "내전.gg",
-    locale: "ko_KR",
-    type: "website",
     images: [
       {
         url: ogImageAbs,
-        secureUrl: ogImageAbs,
-        type: "image/png",
         width: 1200,
         height: 630,
-        alt: "내전.gg 로고",
       },
     ],
   },
   twitter: {
     card: "summary",
-    title: "내전.gg",
-    description: "내전 전적 사이트",
-    images: [
-      {
-        url: ogImageAbs,
-        secureUrl: ogImageAbs,
-        type: "image/png",
-      },
-    ],
+    images: [ogImageAbs],
   },
 };
 
@@ -67,9 +49,7 @@ export default function RootLayout({
           href={PRETENDARD_GOV_CSS}
           crossOrigin="anonymous"
         />
-        <link rel="icon" href="/icon.png?v=2" type="image/png" />
-        <link rel="icon" href="/favicon.ico?v=2" sizes="any" />
-        <link rel="apple-touch-icon" href="/icon.png?v=2" />
+        <link rel="icon" href="/icon.png?v=7" type="image/png" />
       </head>
       <body className="flex min-h-full flex-col font-sans font-normal leading-relaxed">
         <SiteNav />
