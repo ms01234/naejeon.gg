@@ -12,25 +12,23 @@ const siteUrl =
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "내전.gg",
-  description: "우리들만의 명예의 전당",
+  description: "내전 전적 사이트",
   icons: {
     icon: [
-      {
-        // 파일명을 바꾸고 버전을 붙여서 새 파일임을 알림
-        url: "/icon.png?v=1",
-        href: "/icon.png?v=1",
-      },
+      { url: "/icon.png?v=2", href: "/icon.png?v=2" },
+      { url: "/favicon.ico?v=2", href: "/favicon.ico?v=2" },
     ],
+    apple: "/icon.png?v=2",
   },
   openGraph: {
     title: "내전.gg",
-    description: "우리들만의 명예의 전당",
+    description: "내전 전적 사이트",
     images: [{ url: "/naejeon.png", width: 512, height: 512, alt: "내전.gg" }],
   },
   twitter: {
     card: "summary",
     title: "내전.gg",
-    description: "우리들만의 명예의 전당",
+    description: "내전 전적 사이트",
     images: ["/naejeon.png"],
   },
 };
@@ -48,6 +46,9 @@ export default function RootLayout({
           href={PRETENDARD_GOV_CSS}
           crossOrigin="anonymous"
         />
+        <link rel="icon" href="/icon.png?v=2" type="image/png" />
+        <link rel="icon" href="/favicon.ico?v=2" sizes="any" />
+        <link rel="apple-touch-icon" href="/icon.png?v=2" />
       </head>
       <body className="flex min-h-full flex-col font-sans font-normal leading-relaxed">
         <SiteNav />
