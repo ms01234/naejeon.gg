@@ -2,7 +2,6 @@ import {
   MessageFlags,
   PermissionFlagsBits,
   PermissionsBitField,
-  type ChatInputCommandInteraction,
   type Interaction,
   type PermissionResolvable,
 } from "discord.js";
@@ -64,39 +63,6 @@ export async function assertGuildAdminOrReply(
       content: GUILD_ADMIN_ONLY_MESSAGE,
       flags: MessageFlags.Ephemeral,
     });
-  }
-  return false;
-}
-
-export function hasRecorderRole(
-  interaction: Interaction,
-  recorderRoleId: string | undefined,
-): boolean {
-  if (!recorderRoleId) return true;
-  if (!interaction.inGuild() || !interaction.member) return false;
-  const roles = interaction.member.roles;
-  if ("cache" in roles) {
-    return roles.cache.has(recorderRoleId);
-  }
-  if (Array.isArray(roles)) {
-    return roles.includes(recorderRoleId);
-  }
-  return false;
-}
-
-/**
- * @deprecated 라우터는 `assertGuildAdminOrReply` 로 통일했습니다. 레거시 참고용.
- * 전적 삭제: Discord **Administrator** 이거나, 설정된 `matchDeleteRoleId` 역할 보유.
- */
-export function canDeleteMatchRecord(
-  interaction: ChatInputCommandInteraction,
-  matchDeleteRoleId: string | undefined,
-): boolean {
-  if (!interaction.inGuild() || !interaction.member) return false;
-  const perms = interaction.memberPermissions;
-  if (perms?.has(PermissionFlagsBits.Administrator)) return true;
-  if (matchDeleteRoleId) {
-    return hasRecorderRole(interaction, matchDeleteRoleId);
   }
   return false;
 }

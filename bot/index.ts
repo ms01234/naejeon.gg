@@ -8,8 +8,6 @@ const token = (
   process.env.DISCORD_TOKEN ||
   ""
 ).trim();
-const recorderRoleId = process.env.DISCORD_RECORDER_ROLE_ID;
-const matchDeleteRoleId = process.env.DISCORD_MATCH_DELETE_ROLE_ID?.trim() || undefined;
 
 if (!token) {
   console.error("DISCORD_BOT_TOKEN 이 필요합니다.");
@@ -17,7 +15,7 @@ if (!token) {
 }
 
 const supabase = createServiceSupabase();
-const ctx = { supabase, recorderRoleId, matchDeleteRoleId };
+const ctx = { supabase };
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
