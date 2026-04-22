@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const LOGO_SRC = "/naejeon.png";
+import { SITE_PUBLIC_LOGO_PATH } from "@/lib/constants";
 
 export function HomeLogo() {
   return (
@@ -18,7 +18,7 @@ export function HomeLogo() {
       aria-label="내전.GG 홈 (새로고침)"
     >
       <Image
-        src={LOGO_SRC}
+        src={SITE_PUBLIC_LOGO_PATH}
         alt="내전.GG"
         width={280}
         height={112}
