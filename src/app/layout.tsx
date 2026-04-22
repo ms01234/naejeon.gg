@@ -14,19 +14,19 @@ export const metadata: Metadata = {
   title: "내전.GG",
   description: "5대5 내전 전적 · OP.GG 스타일",
   icons: {
-    icon: [{ url: "/naejein.png", type: "image/png" }],
-    apple: [{ url: "/naejein.png", type: "image/png" }],
+    icon: [{ url: "/naejeon.png", type: "image/png" }],
+    apple: [{ url: "/naejeon.png", type: "image/png" }],
   },
   openGraph: {
     title: "내전.GG",
     description: "5대5 내전 전적 · OP.GG 스타일",
-    images: [{ url: "/naejein.png", width: 512, height: 512, alt: "내전.GG" }],
+    images: [{ url: "/naejeon.png", width: 512, height: 512, alt: "내전.GG" }],
   },
   twitter: {
     card: "summary",
     title: "내전.GG",
     description: "5대5 내전 전적 · OP.GG 스타일",
-    images: ["/naejein.png"],
+    images: ["/naejeon.png"],
   },
 };
 

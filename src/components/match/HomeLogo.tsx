@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const LOGO_SRC = "/naejein.png";
+const LOGO_SRC = "/naejeon.png";
 
 export function HomeLogo() {
   return (
