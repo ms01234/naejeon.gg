@@ -9,13 +9,35 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
   "http://localhost:3000";
 
+/**
+ * 브라우저가 파비콘을 오래 캐시합니다. `src/app/favicon.ico` 교체 후에도 예전 아이콘이면
+ * 이 값만 올려서 새 URL로 강제 갱신하세요. (예: ?v=1 → ?v=2)
+ */
+const ICON_CACHE_BUST = "1";
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "내전.GG",
   description: "5대5 내전 전적 · OP.GG 스타일",
   icons: {
-    icon: [{ url: "/naejeon.png", type: "image/png" }],
-    apple: [{ url: "/naejeon.png", type: "image/png" }],
+    icon: [
+      {
+        url: `/favicon.ico?v=${ICON_CACHE_BUST}`,
+        sizes: "any",
+      },
+      {
+        url: `/naejeon.png?v=${ICON_CACHE_BUST}`,
+        type: "image/png",
+        sizes: "512x512",
+      },
+    ],
+    shortcut: [{ url: `/favicon.ico?v=${ICON_CACHE_BUST}` }],
+    apple: [
+      {
+        url: `/naejeon.png?v=${ICON_CACHE_BUST}`,
+        type: "image/png",
+      },
+    ],
   },
   openGraph: {
     title: "내전.GG",
