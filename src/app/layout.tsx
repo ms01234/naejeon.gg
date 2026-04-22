@@ -9,7 +9,7 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
   "https://naejeon-gg.vercel.app";
 
-const ogImagePath = "/og-image.png?v=5";
+const ogImageAbs = `${siteUrl}/og-image.png?v=6`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -31,7 +31,9 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: ogImagePath,
+        url: ogImageAbs,
+        secureUrl: ogImageAbs,
+        type: "image/png",
         width: 1200,
         height: 630,
         alt: "내전.gg 로고",
@@ -42,7 +44,13 @@ export const metadata: Metadata = {
     card: "summary",
     title: "내전.gg",
     description: "내전 전적 사이트",
-    images: [ogImagePath],
+    images: [
+      {
+        url: ogImageAbs,
+        secureUrl: ogImageAbs,
+        type: "image/png",
+      },
+    ],
   },
 };
 
