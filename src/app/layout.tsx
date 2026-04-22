@@ -7,7 +7,7 @@ const PRETENDARD_GOV_CSS =
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-  "http://localhost:3000";
+  "https://naejeon-gg.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -23,13 +23,24 @@ export const metadata: Metadata = {
   openGraph: {
     title: "내전.gg",
     description: "내전 전적 사이트",
-    images: [{ url: "/naejeon.png", width: 512, height: 512, alt: "내전.gg" }],
+    url: siteUrl,
+    siteName: "내전.gg",
+    locale: "ko_KR",
+    type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "내전.gg 로고",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "내전.gg",
     description: "내전 전적 사이트",
-    images: ["/naejeon.png"],
+    images: ["/og-image.png"],
   },
 };
 
