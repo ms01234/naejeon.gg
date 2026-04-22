@@ -2,7 +2,7 @@
 @config "../../tailwind.config.js";
 
 /*
- * 색 토큰 — 컴포넌트에서는 var(--op-*) 만 사용 (하드코드 # 제거).
+ * 색 토큰 — 다크 UI는 var(--op-*), 명예의 전당 라이트 카드는 var(--hof-*).
  * - page: 전역 배경
  * - surface: 매치 카드·카드형 섹션 면 (#252529, 배경보다 살짝 밝게)
  * - surface-header-from: 매치 카드 헤더 그라데이션 시작
@@ -27,6 +27,15 @@
   --op-red: #e11d48;
   --op-red-bright: #fb7185;
   --op-logo-box: #2563eb;
+
+  /* 명예의 전당 — 다크 페이지 위 라이트 카드 (HallOfFame) */
+  --hof-surface: #f1f5f9;
+  --hof-charcoal: #1e293b;
+  --hof-nickname: #0f172a;
+  --hof-muted: #475569;
+  --hof-rank-1: #f52945;
+  --hof-rank-2: #a53df5;
+  --hof-rank-3: #2cf487;
 }
 
 @theme inline {
