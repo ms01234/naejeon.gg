@@ -28,14 +28,14 @@
   --op-red-bright: #fb7185;
   --op-logo-box: #2563eb;
 
-  /* 명예의 전당 — 다크 페이지 위 라이트 카드 (HallOfFame) */
-  --hof-surface: #f1f5f9;
-  --hof-charcoal: #1e293b;
-  --hof-nickname: #0f172a;
-  --hof-muted: #475569;
+  /* 명예의 전당 — 글래스 카드 (HallOfFame, 다크 배경 위) */
+  --hof-surface: rgb(255 255 255 / 0.03);
+  --hof-charcoal: #cbd5e1;
+  --hof-nickname: #ffffff;
+  --hof-muted: #94a3b8;
   --hof-rank-1: #f52945;
   --hof-rank-2: #a53df5;
-  --hof-rank-3: #2cf487;
+  --hof-rank-3: #16c97f;
 }
 
 @theme inline {

@@ -88,10 +88,10 @@ export async function MatchHistory() {
         ))}
       </ul>
       {showMore ? (
-        <div className="mt-5 flex justify-center">
+        <div className="mt-5 w-full">
           <Link
             href="/matches"
-            className="inline-flex w-full max-w-md items-center justify-center rounded-xl border border-[var(--op-border)] bg-[var(--op-elevated)] px-5 py-3.5 text-sm font-semibold text-[var(--op-text)] shadow-inner shadow-black/20 transition hover:border-[var(--op-accent)]/35 hover:bg-[var(--op-panel)] hover:text-[var(--op-accent-bright)]"
+            className="flex w-full items-center justify-center rounded-xl border border-[var(--op-border)] bg-[var(--op-elevated)] px-5 py-2.5 text-sm font-semibold text-[var(--op-text)] shadow-inner shadow-black/20 transition hover:border-[var(--op-accent)]/35 hover:bg-[var(--op-panel)] hover:text-[var(--op-accent-bright)] sm:py-3"
           >
             더보기
           </Link>

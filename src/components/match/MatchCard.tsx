@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MatchDamageBar } from "@/components/match/MatchDamageBar";
+import { normalizeTeamSide } from "@/lib/team";
 import type { MatchCardUi, ParticipantUi } from "@/types/match";
 
 /** 승리 팀 / 패배 팀 배경 (지시문 색상) */
@@ -133,7 +134,7 @@ type Props = { data: MatchCardUi };
 
 export function MatchCard({ data }: Props) {
   const { match, blue, red } = data;
-  const blueWon = match.winner === "blue";
+  const blueWon = normalizeTeamSide(match.winner) === "blue";
   const played = new Date(match.created_at);
   const matchMaxDamage = Math.max(
     1,

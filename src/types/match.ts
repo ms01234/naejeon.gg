@@ -42,4 +42,8 @@ export type ChampionAggregate = {
   games: number;
   wins: number;
   win_rate: number;
+  /** (해당 챔피언 판수) / (소환사 전체 완료 매치 참여 수) × 100 */
+  pick_rate: number;
+  /** 집계 K+A 대 D (D=0이면 K+A) */
+  avg_kda: number;
 };

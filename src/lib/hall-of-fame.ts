@@ -1,4 +1,5 @@
 import { championIconUrlByName } from "@/lib/ddragon";
+import { normalizeTeamSide } from "@/lib/team";
 import { createPublicSupabaseClient } from "@/lib/supabaseClient";
 
 function num(v: unknown): number {
@@ -17,22 +18,11 @@ function matchJoinKey(v: unknown): string | null {
   return String(Math.trunc(n));
 }
 
-/** 동일 인물 표기 차이를 줄이기 위한 닉네임 집계 키 (승·KDA는 닉네임 통산) */
-function nicknameAggregateKey(raw: string): string | null {
+/** 동일 인물 표기 차이를 줄이기 위한 닉네임 집계 키 (명예의 전당·개인 배지 매칭에 동일 사용) */
+export function hallOfFameNicknameKey(raw: string): string | null {
   const s = raw.normalize("NFKC").trim();
   return s.length > 0 ? s : null;
 }
-
-/** matches.winner / match_participants.team 과 동일 규칙으로 비교 (대소문자·앞뒤 공백 무시) */
-function normalizeTeam(t: string | null | undefined): "blue" | "red" | null {
-  const s = String(t ?? "")
-    .trim()
-    .toLowerCase();
-  if (s === "blue") return "blue";
-  if (s === "red") return "red";
-  return null;
-}
-
 
 type PartRow = {
   match_id: unknown;
@@ -141,7 +131,7 @@ export async function fetchHallOfFameTop3(): Promise<
   >();
   for (const m of mRes.rows) {
     const k = matchJoinKey(m.id);
-    const w = normalizeTeam(m.winner);
+    const w = normalizeTeamSide(m.winner);
     if (k == null || w == null) continue;
     winByMatch.set(k, { winner: w, created_at: m.created_at ?? "" });
   }
@@ -158,8 +148,8 @@ export async function fetchHallOfFameTop3(): Promise<
   const completeMatchIds = new Set<string>();
   for (const [mk, list] of partsByMatch) {
     if (list.length !== 10) continue;
-    const blue = list.filter((x) => normalizeTeam(x.team) === "blue").length;
-    const red = list.filter((x) => normalizeTeam(x.team) === "red").length;
+    const blue = list.filter((x) => normalizeTeamSide(x.team) === "blue").length;
+    const red = list.filter((x) => normalizeTeamSide(x.team) === "red").length;
     if (blue === 5 && red === 5 && winByMatch.has(mk)) {
       completeMatchIds.add(mk);
     }
@@ -171,9 +161,9 @@ export async function fetchHallOfFameTop3(): Promise<
     const meta = winByMatch.get(mk)!;
     const list = partsByMatch.get(mk) ?? [];
     for (const p of list) {
-      const nickKey = nicknameAggregateKey(String(p.nickname ?? ""));
+      const nickKey = hallOfFameNicknameKey(String(p.nickname ?? ""));
       if (nickKey == null) continue;
-      const team = normalizeTeam(p.team);
+      const team = normalizeTeamSide(p.team);
       if (team == null) continue;
 
       let agg = byNick.get(nickKey);
@@ -239,4 +229,19 @@ export async function fetchHallOfFameTop3(): Promise<
   }
 
   return { ok: true, entries };
+}
+
+/** 개인 페이지 배지용 — 전체 승수 TOP3 안에 있으면 1·2·3, 아니면 null */
+export async function fetchHallOfFameRankForPlayer(
+  playerName: string,
+): Promise<1 | 2 | 3 | null> {
+  const res = await fetchHallOfFameTop3();
+  if (!res.ok) return null;
+  const key = hallOfFameNicknameKey(playerName);
+  if (!key) return null;
+  const i = res.entries.findIndex(
+    (e) => hallOfFameNicknameKey(e.nickname) === key,
+  );
+  if (i < 0) return null;
+  return (i + 1) as 1 | 2 | 3;
 }
