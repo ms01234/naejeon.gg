@@ -1,13 +1,15 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 const LOGO_SRC = "/naejein.png";
 
 export function HomeLogo() {
   return (
-    <a
+    <Link
       href="/"
+      prefetch={false}
       onClick={(e) => {
         e.preventDefault();
         window.location.assign("/");
@@ -24,6 +26,6 @@ export function HomeLogo() {
         priority
         className="h-auto w-auto max-w-[104px] rounded-lg object-contain sm:max-w-[120px]"
       />
-    </a>
+    </Link>
   );
 }
