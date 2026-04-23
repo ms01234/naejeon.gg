@@ -142,6 +142,14 @@ export async function HallOfFame() {
                       <span className="font-medium"> 회</span>
                     </span>
                     <span>
+                      승률{" "}
+                      <strong
+                        className={`text-xs font-bold tabular-nums sm:text-[13px] ${accent} ${glow}`}
+                      >
+                        {e.winRatePercent.toFixed(1)}%
+                      </strong>
+                    </span>
+                    <span>
                       평균 KDA{" "}
                       <strong className="font-medium text-[color:var(--hof-charcoal)]">
                         {formatHallOfFameKda(e.avgKda)}

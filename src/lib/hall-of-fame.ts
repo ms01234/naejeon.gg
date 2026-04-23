@@ -44,6 +44,8 @@ export type HallOfFameEntry = {
   rank: number;
   nickname: string;
   wins: number;
+  /** (승리 / 완료 매치 참여 수) × 100 */
+  winRatePercent: number;
   avgKda: number;
   championIconUrl: string | null;
 };
@@ -51,6 +53,8 @@ export type HallOfFameEntry = {
 type Agg = {
   /** 표시용 닉네임(첫 등장 문자열) */
   displayNickname: string;
+  /** 완료 매치(10인·승자 확정) 참여 횟수 */
+  games: number;
   /** 완료 매치 통산 승리 수 (챔피언 무관) */
   wins: number;
   kills: number;
@@ -170,6 +174,7 @@ export async function fetchHallOfFameTop3(): Promise<
       if (!agg) {
         agg = {
           displayNickname: String(p.nickname ?? "").trim() || nickKey,
+          games: 0,
           wins: 0,
           kills: 0,
           deaths: 0,
@@ -181,6 +186,7 @@ export async function fetchHallOfFameTop3(): Promise<
       }
 
       const ch = (p.champion ?? "").trim() || "—";
+      agg.games += 1;
       agg.kills += Number(p.kills ?? 0);
       agg.deaths += Number(p.deaths ?? 0);
       agg.assists += Number(p.assists ?? 0);
@@ -219,10 +225,14 @@ export async function fetchHallOfFameTop3(): Promise<
       ? await championIconUrlByName(showChamp)
       : null;
 
+    const winRatePercent =
+      agg.games > 0 ? (agg.wins / agg.games) * 100 : 0;
+
     entries.push({
       rank: i + 1,
       nickname: agg.displayNickname,
       wins: agg.wins,
+      winRatePercent,
       avgKda,
       championIconUrl,
     });

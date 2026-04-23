@@ -59,11 +59,6 @@ export function PlayerChampionSection({
   const emptyLane =
     tab !== "ALL" && list.length === 0 && rows.length > 0;
 
-  const maxPick = useMemo(
-    () => Math.max(1, ...list.map((c) => c.pick_rate)),
-    [list],
-  );
-
   return (
     <section className="w-full rounded-xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-md sm:p-6">
       <h2 className="mb-4 text-lg font-semibold text-[var(--op-text)]">
@@ -139,7 +134,15 @@ export function PlayerChampionSection({
                 <div className="h-2 overflow-hidden rounded-full bg-[var(--op-bg)]">
                   <div
                     className="h-full max-w-full rounded-full bg-gradient-to-r from-[#F52945]/90 via-[#A53DF5]/85 to-[#2CF487]/90"
-                    style={{ width: `${(c.pick_rate / maxPick) * 100}%` }}
+                    style={{
+                      width: `${Math.min(
+                        100,
+                        Math.max(
+                          0,
+                          Number.isFinite(c.pick_rate) ? c.pick_rate : 0,
+                        ),
+                      )}%`,
+                    }}
                   />
                 </div>
               </div>

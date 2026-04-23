@@ -15,7 +15,7 @@ type Agg = { games: number; wins: number; k: number; d: number; a: number };
 /**
  * 라인 필터 적용 후 챔피언별 집계.
  * 승률은 행의 is_win(팀 vs winner, 대소문자 무시 정규화는 loadPlayerStatRows) 기준.
- * pick_rate = (챔피언 판수) / totalGames × 100 — totalGames 는 필터와 무관한 전체 참여 판수.
+ * pick_rate = (챔피언 판수) / totalGames × 100 — totalGames 는 필터와 무관한 전체 참여 판수. totalGames ≤ 0 이면 0.
  */
 export function aggregateChampionStats(
   rows: PlayerStatRow[],
@@ -38,17 +38,17 @@ export function aggregateChampionStats(
     map.set(c, cur);
   }
 
-  const denom = Math.max(1, totalGames);
-
   const list: ChampionAggregate[] = [...map.entries()].map(
     ([champion, s]) => {
       const avg_kda = s.d > 0 ? (s.k + s.a) / s.d : s.k + s.a;
+      const pick_rate =
+        totalGames > 0 ? (s.games / totalGames) * 100 : 0;
       return {
         champion,
         games: s.games,
         wins: s.wins,
         win_rate: s.games > 0 ? s.wins / s.games : 0,
-        pick_rate: (s.games / denom) * 100,
+        pick_rate,
         avg_kda,
       };
     },
