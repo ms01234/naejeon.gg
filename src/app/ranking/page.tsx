@@ -5,11 +5,11 @@ import { getRankingsPayload } from "@/lib/ranking-stats";
 import { RankingTabs } from "@/components/ranking/RankingTabs";
 import { RankingPageSkeleton } from "@/components/ranking/RankingPageSkeleton";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: `종합 랭킹 · ${SITE_TITLE}`,
-  description: "승률·KDA·챔피언 풀(올라운더) 랭킹",
+  description: "승률·KDA·챔피언 폭(고유 챔피언 수) 랭킹",
 };
 
 async function RankingData() {
@@ -32,8 +32,8 @@ export default function RankingPage() {
           종합 랭킹
         </h1>
         <p className="mb-8 text-sm text-[var(--op-muted)]">
-          승률, KDA, 올라운더(고유 챔피언 수)를 탭으로 전환해 볼 수 있습니다. 데이터는 약
-          1분 간격으로 갱신됩니다.
+          승률, KDA, 챔피언 폭(고유 챔피언 수)을 탭으로 전환해 볼 수 있습니다. 데이터는 최대
+          약 1시간 간격으로 갱신됩니다.
         </p>
         <Suspense fallback={<RankingPageSkeleton />}>
           <RankingData />

@@ -3,7 +3,10 @@ import { hallOfFameNicknameKey } from "@/lib/hall-of-fame";
 import { normalizeTeamSide } from "@/lib/team";
 import { createPublicSupabaseClient } from "@/lib/supabaseClient";
 
-const MIN_GAMES = 3;
+/** KDA·챔피언 폭 랭킹 최소 판수 */
+const MIN_GAMES_KDA_POOL = 3;
+/** 승률 랭킹만 더 엄격하게 */
+const MIN_GAMES_WIN_RATE = 5;
 
 type PartRow = {
   match_id: unknown;
@@ -187,9 +190,14 @@ async function buildRankingsPayload(): Promise<RankingsPayload | null> {
     if (!mRes.ok || !pRes.ok) return null;
 
     const byNick = aggregateFromCompleteMatches(mRes.rows, pRes.rows);
-    const qualified = [...byNick.values()].filter((a) => a.games >= MIN_GAMES);
+    const qualifiedKdaPool = [...byNick.values()].filter(
+      (a) => a.games >= MIN_GAMES_KDA_POOL,
+    );
+    const qualifiedWinRate = qualifiedKdaPool.filter(
+      (a) => a.games >= MIN_GAMES_WIN_RATE,
+    );
 
-    const winRate = [...qualified]
+    const winRate = [...qualifiedWinRate]
       .map((a) => {
         const rate = a.games > 0 ? (a.wins / a.games) * 100 : 0;
         return {
@@ -215,7 +223,7 @@ async function buildRankingsPayload(): Promise<RankingsPayload | null> {
         winRatePercent: r.winRatePercent,
       }));
 
-    const kda = [...qualified]
+    const kda = [...qualifiedKdaPool]
       .map((a) => {
         const perfect = a.deaths === 0;
         const kdaValue = perfect
@@ -239,7 +247,8 @@ async function buildRankingsPayload(): Promise<RankingsPayload | null> {
           if (B.games !== A.games) return B.games - A.games;
           return A.nickname.localeCompare(B.nickname, "ko");
         }
-        if (B.kdaValue !== A.kdaValue) return B.kdaValue - A.kdaValue;
+        const kdaDiff = B.kdaValue - A.kdaValue;
+        if (Math.abs(kdaDiff) > 1e-9) return kdaDiff;
         if (B.games !== A.games) return B.games - A.games;
         return A.nickname.localeCompare(B.nickname, "ko");
       })
@@ -254,7 +263,7 @@ async function buildRankingsPayload(): Promise<RankingsPayload | null> {
         kdaValue: r.kdaValue,
       }));
 
-    const allRounder = [...qualified]
+    const allRounder = [...qualifiedKdaPool]
       .map((a) => ({
         nickname: a.displayNickname,
         games: a.games,
@@ -280,6 +289,6 @@ async function buildRankingsPayload(): Promise<RankingsPayload | null> {
   }
 }
 
-export const getRankingsPayload = unstable_cache(buildRankingsPayload, ["rankings-payload-v1"], {
-  revalidate: 60,
+export const getRankingsPayload = unstable_cache(buildRankingsPayload, ["rankings-payload-v2"], {
+  revalidate: 3600,
 });
