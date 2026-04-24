@@ -9,7 +9,10 @@ import {
   buildRecordPanelDisabledRow,
   buildRecordPanelRows,
 } from "../components/recordPanel";
-import { formatSecondsAsClock } from "../lib/formatDuration";
+import {
+  formatDurationRecordedKr,
+  formatSecondsAsClock,
+} from "../lib/formatDuration";
 import { parseFinalizeFields } from "./finalizeModal";
 import { parseRecordModalId } from "../lib/customIds";
 import { resolveGuildIdForStore } from "../lib/guild";
@@ -163,7 +166,7 @@ export async function handleRecordModalSubmit(
         });
 
         const detail =
-          `**match id**: \`${result.matchId}\` · 승: **${fin.winner === "blue" ? "블루" : "레드"}** · ${formatSecondsAsClock(fin.durationSeconds)}`;
+          `**match id**: \`${result.matchId}\` · 승: **${fin.winner === "blue" ? "블루" : "레드"}** · ${formatSecondsAsClock(fin.durationSeconds)}\n${formatDurationRecordedKr(fin.durationSeconds)}`;
 
         if (panelUpdated) {
           await safeReply(interaction, detail);

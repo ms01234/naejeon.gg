@@ -35,7 +35,7 @@ export async function handleRecordCommand(
       "1) **블루팀 입력** → 2) **레드팀 입력** → 3) **최종 저장** 순으로 진행하세요.\n\n" +
       "팀 입력 모달에는 **5줄**을 넣습니다. 각 줄 (닉/챔은 **/** 로만 구분):\n" +
       "`닉네임/챔피언 K D A 딜량` (예: `Hide on bush/제이스 7 2 5 45231`)\n\n" +
-      "※ **최종 저장**은 블루·레드가 모두 채워진 뒤에만 누를 수 있습니다. 경기 시간은 **초** 단위(60~10800)로 입력합니다.",
+      "※ **최종 저장**은 블루·레드가 모두 채워진 뒤에만 누를 수 있습니다. 경기 시간은 **분:초**(예: `32:00`) 또는 **총 초** 60~10800(예: `1920`)로 입력합니다.",
     components: buildRecordPanelRows(storeGuildId, userId, ready),
     flags: MessageFlags.Ephemeral,
   });
