@@ -7,6 +7,7 @@ export function SiteNav() {
   const pathname = usePathname() ?? "";
   const homeActive = pathname === "/" || pathname === "";
   const matchesActive = pathname.startsWith("/matches");
+  const rankingActive = pathname.startsWith("/ranking");
 
   const navLink = (active: boolean) =>
     [
@@ -34,6 +35,9 @@ export function SiteNav() {
           </Link>
           <Link href="/matches" className={navLink(matchesActive)}>
             전적
+          </Link>
+          <Link href="/ranking" className={navLink(rankingActive)}>
+            랭킹
           </Link>
         </nav>
       </div>

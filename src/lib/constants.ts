@@ -23,3 +23,8 @@ export function siteOgImageAbsoluteUrl(): string {
 export function siteIconPath(): string {
   return `/icon.png?v=${SITE_ASSET_CACHE_VERSION}`;
 }
+
+/** 종합 랭킹 1·2·3등 메달 (요청 색상) — globals `--op-*` 와 함께 다크 UI에 사용 */
+export const RANK_MEDAL_GOLD = "#D4AF37";
+export const RANK_MEDAL_SILVER = "#C0C0C0";
+export const RANK_MEDAL_BRONZE = "#CD7F32";
