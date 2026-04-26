@@ -40,26 +40,33 @@ function kdaNumericForColor(row: KdaRankEntry): number {
   return row.kdaValue;
 }
 
+/** 리스트 전적 표기: `26판 (17승 9패)` */
+function formatWinRecordLine(r: WinRateRankEntry): string {
+  return `${r.games}판 (${r.wins}승 ${r.losses}패)`;
+}
+
 function WinRateRestTable({ rows }: { rows: WinRateRankEntry[] }) {
   if (rows.length === 0) return null;
   return (
     <div className="rounded-xl border border-white/10 bg-[var(--op-panel)]">
       <TableScroll>
-        <table className="w-full min-w-[20.5rem] table-fixed border-collapse text-left text-[11px] leading-snug sm:min-w-0 sm:text-sm sm:leading-normal">
+        <table className="w-full min-w-[18rem] table-fixed border-collapse text-left text-[11px] leading-snug sm:min-w-0 sm:text-sm sm:leading-normal">
           <colgroup>
-            <col className="w-11 sm:w-14" />
-            <col className="w-[32%] sm:w-[30%]" />
-            <col className="w-[4.25rem] sm:w-24" />
+            <col className="w-10 sm:w-12" />
             <col />
+            <col className="w-[4.5rem] sm:w-[5rem]" />
+            <col className="w-[10.75rem] sm:w-[11.25rem]" />
           </colgroup>
           <thead>
             <tr className="border-b border-white/10 text-[10px] font-medium uppercase tracking-wide text-[var(--op-muted)] sm:text-xs">
-              <th className="px-1.5 py-2.5 sm:px-3 sm:py-3">순위</th>
+              <th className="px-1.5 py-2.5 text-right tabular-nums sm:px-3 sm:py-3">
+                순위
+              </th>
               <th className="min-w-0 px-1.5 py-2.5 sm:px-3 sm:py-3">소환사</th>
-              <th className="whitespace-nowrap px-1.5 py-2.5 text-right sm:px-3 sm:py-3">
+              <th className="whitespace-nowrap px-1 py-2.5 text-right tabular-nums sm:px-2 sm:py-3">
                 승률
               </th>
-              <th className="whitespace-nowrap px-1.5 py-2.5 pr-2 text-right sm:px-3 sm:py-3">
+              <th className="whitespace-nowrap py-2.5 pl-1 pr-2 text-right tabular-nums sm:py-3 sm:pr-3">
                 전적
               </th>
             </tr>
@@ -67,8 +74,10 @@ function WinRateRestTable({ rows }: { rows: WinRateRankEntry[] }) {
           <tbody className="divide-y divide-white/[0.06]">
             {rows.map((r) => (
               <tr key={r.nickname} className={rowShellClass()}>
-                <td className="px-1.5 py-2 align-middle tabular-nums sm:px-3 sm:py-3">
-                  <span className="font-semibold text-[var(--op-text)]">{r.rank}</span>
+                <td className="px-1.5 py-2 text-right align-middle tabular-nums sm:px-3 sm:py-3">
+                  <span className="inline-block min-w-[1.5ch] text-right font-semibold text-[var(--op-text)]">
+                    {r.rank}
+                  </span>
                 </td>
                 <td className="min-w-0 max-w-0 px-1.5 py-2 align-middle sm:px-3 sm:py-3">
                   <Link
@@ -79,11 +88,11 @@ function WinRateRestTable({ rows }: { rows: WinRateRankEntry[] }) {
                     {r.nickname}
                   </Link>
                 </td>
-                <td className="whitespace-nowrap px-1.5 py-2 text-right font-semibold tabular-nums text-[var(--op-text)] sm:px-3 sm:py-3">
+                <td className="box-border whitespace-nowrap px-1 py-2 text-right align-middle font-semibold tabular-nums text-[var(--op-text)] sm:px-2 sm:py-3">
                   {r.winRatePercent.toFixed(1)}%
                 </td>
-                <td className="whitespace-nowrap px-1.5 py-2 pr-2 text-right tabular-nums text-[var(--op-muted)] sm:px-3 sm:py-3">
-                  {r.wins}승{r.losses}패·{r.games}판
+                <td className="box-border whitespace-nowrap py-2 pl-1 pr-2 text-right align-middle tabular-nums text-[var(--op-muted)] sm:py-3 sm:pr-3">
+                  {formatWinRecordLine(r)}
                 </td>
               </tr>
             ))}
@@ -99,21 +108,23 @@ function KdaRestTable({ rows }: { rows: KdaRankEntry[] }) {
   return (
     <div className="rounded-xl border border-white/10 bg-[var(--op-panel)]">
       <TableScroll>
-        <table className="w-full min-w-[19rem] table-fixed border-collapse text-left text-[11px] leading-snug sm:min-w-0 sm:text-sm sm:leading-normal">
+        <table className="w-full min-w-[17.5rem] table-fixed border-collapse text-left text-[11px] leading-snug sm:min-w-0 sm:text-sm sm:leading-normal">
           <colgroup>
-            <col className="w-11 sm:w-14" />
-            <col className="w-[34%] sm:w-[32%]" />
-            <col className="w-[3.75rem] sm:w-24" />
+            <col className="w-10 sm:w-12" />
             <col />
+            <col className="w-[4.75rem] sm:w-[5.25rem]" />
+            <col className="w-[7.25rem] sm:w-[7.75rem]" />
           </colgroup>
           <thead>
             <tr className="border-b border-white/10 text-[10px] font-medium uppercase tracking-wide text-[var(--op-muted)] sm:text-xs">
-              <th className="px-1.5 py-2.5 sm:px-3 sm:py-3">순위</th>
+              <th className="px-1.5 py-2.5 text-right tabular-nums sm:px-3 sm:py-3">
+                순위
+              </th>
               <th className="min-w-0 px-1.5 py-2.5 sm:px-3 sm:py-3">소환사</th>
-              <th className="whitespace-nowrap px-1.5 py-2.5 text-right sm:px-3 sm:py-3">
+              <th className="whitespace-nowrap px-1 py-2.5 text-right tabular-nums sm:px-2 sm:py-3">
                 KDA
               </th>
-              <th className="whitespace-nowrap px-1.5 py-2.5 pr-2 text-right sm:px-3 sm:py-3">
+              <th className="whitespace-nowrap py-2.5 pl-1 pr-2 text-right tabular-nums sm:py-3 sm:pr-3">
                 K/D/A
               </th>
             </tr>
@@ -123,8 +134,10 @@ function KdaRestTable({ rows }: { rows: KdaRankEntry[] }) {
               const kdaColor = rankingKdaDisplayTextColorHex(kdaNumericForColor(r));
               return (
                 <tr key={r.nickname} className={rowShellClass()}>
-                  <td className="px-1.5 py-2 align-middle tabular-nums sm:px-3 sm:py-3">
-                    <span className="font-semibold text-[var(--op-text)]">{r.rank}</span>
+                  <td className="px-1.5 py-2 text-right align-middle tabular-nums sm:px-3 sm:py-3">
+                    <span className="inline-block min-w-[1.5ch] text-right font-semibold text-[var(--op-text)]">
+                      {r.rank}
+                    </span>
                   </td>
                   <td className="min-w-0 max-w-0 px-1.5 py-2 align-middle sm:px-3 sm:py-3">
                     <Link
@@ -136,12 +149,12 @@ function KdaRestTable({ rows }: { rows: KdaRankEntry[] }) {
                     </Link>
                   </td>
                   <td
-                    className="whitespace-nowrap px-1.5 py-2 text-right font-semibold tabular-nums sm:px-3 sm:py-3"
+                    className="box-border whitespace-nowrap px-1 py-2 text-right align-middle font-semibold tabular-nums sm:px-2 sm:py-3"
                     style={{ color: kdaColor }}
                   >
                     {formatKdaDisplay(r)}
                   </td>
-                  <td className="whitespace-nowrap px-1.5 py-2 pr-2 text-right tabular-nums text-[var(--op-muted)] sm:px-3 sm:py-3">
+                  <td className="box-border whitespace-nowrap py-2 pl-1 pr-2 text-right align-middle font-medium tabular-nums tracking-tight text-[var(--op-muted)] sm:py-3 sm:pr-3">
                     {r.kills}/{r.deaths}/{r.assists}
                   </td>
                 </tr>
