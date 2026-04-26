@@ -44,7 +44,15 @@ export type HallOfFameEntryCardProps = {
   wins: number;
   winRatePercent: number;
   avgKda: number;
+  /**
+   * `kda`: KDA 랭킹 상단 카드 — 승·승률은 약한 스타일, KDA만 등수색 강조.
+   * 생략 시(홈 명예의 전당·승률 랭킹): 승·승률 강조, KDA는 보조 스타일.
+   */
+  statEmphasis?: "default" | "kda";
 };
+
+const hofPlainStatStrongClass =
+  "text-xs font-medium tabular-nums text-[color:var(--hof-charcoal)] sm:text-[13px]";
 
 export function HallOfFameEntryCard({
   rank,
@@ -53,10 +61,12 @@ export function HallOfFameEntryCard({
   wins,
   winRatePercent,
   avgKda,
+  statEmphasis = "default",
 }: HallOfFameEntryCardProps) {
   const isFirst = rank === 1;
   const accent = hofRankAccentClass(rank);
   const glow = hofRankGlowClass(rank);
+  const emphasizeKda = statEmphasis === "kda";
   const cardClass = [
     hofEntryCardBaseClass(rank),
     isFirst ? hofFirstPlaceOuterGlowClass() : "",
@@ -103,7 +113,11 @@ export function HallOfFameEntryCard({
           <span>
             승리{" "}
             <strong
-              className={`text-xs font-bold tabular-nums sm:text-[13px] ${accent} ${glow}`}
+              className={
+                emphasizeKda
+                  ? hofPlainStatStrongClass
+                  : `text-xs font-bold tabular-nums sm:text-[13px] ${accent} ${glow}`
+              }
             >
               {wins}
             </strong>
@@ -112,14 +126,24 @@ export function HallOfFameEntryCard({
           <span>
             승률{" "}
             <strong
-              className={`text-xs font-bold tabular-nums sm:text-[13px] ${accent} ${glow}`}
+              className={
+                emphasizeKda
+                  ? hofPlainStatStrongClass
+                  : `text-xs font-bold tabular-nums sm:text-[13px] ${accent} ${glow}`
+              }
             >
               {winRatePercent.toFixed(1)}%
             </strong>
           </span>
           <span>
             평균 KDA{" "}
-            <strong className="font-medium text-[color:var(--hof-charcoal)]">
+            <strong
+              className={
+                emphasizeKda
+                  ? `text-xs font-bold tabular-nums sm:text-[13px] ${accent} ${glow}`
+                  : "font-medium text-[color:var(--hof-charcoal)]"
+              }
+            >
               {formatHallOfFameKda(avgKda)}
             </strong>
           </span>

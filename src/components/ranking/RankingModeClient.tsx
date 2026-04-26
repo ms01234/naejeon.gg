@@ -240,6 +240,7 @@ function KdaRankingBody({
                 wins={e.wins}
                 winRatePercent={winPct}
                 avgKda={cardKda}
+                statEmphasis="kda"
               />
             </li>
           );
