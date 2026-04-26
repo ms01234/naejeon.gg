@@ -2,14 +2,12 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SITE_TITLE } from "@/lib/constants";
 import { getRankingsPayload } from "@/lib/ranking-stats";
-import { RankingTabs } from "@/components/ranking/RankingTabs";
+import { RankingBoard } from "@/components/ranking/RankingBoard";
 import { RankingPageSkeleton } from "@/components/ranking/RankingPageSkeleton";
-
-export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: `종합 랭킹 · ${SITE_TITLE}`,
-  description: "승률·KDA·챔피언 폭(고유 챔피언 수) 랭킹",
+  description: "승률·KDA 랭킹. 전적이 저장되면 곧바로 반영됩니다.",
 };
 
 async function RankingData() {
@@ -21,19 +19,19 @@ async function RankingData() {
       </div>
     );
   }
-  return <RankingTabs data={data} />;
+  return <RankingBoard data={data} />;
 }
 
 export default function RankingPage() {
   return (
     <div className="min-h-screen bg-[var(--op-page)]">
-      <div className="mx-auto max-w-3xl px-4 pb-16 pt-8 sm:pt-10">
+      <div className="mx-auto max-w-6xl px-4 pb-16 pt-8 sm:pt-10">
         <h1 className="mb-2 text-2xl font-bold tracking-tight text-[var(--op-text)]">
           종합 랭킹
         </h1>
         <p className="mb-8 text-sm text-[var(--op-muted)]">
-          승률, KDA, 챔피언 폭(고유 챔피언 수)을 탭으로 전환해 볼 수 있습니다. 데이터는 최대
-          약 1시간 간격으로 갱신됩니다.
+          승률과 KDA를 나란히 확인할 수 있습니다. 새 전적이 확정되면 이 페이지가 곧바로
+          갱신됩니다.
         </p>
         <Suspense fallback={<RankingPageSkeleton />}>
           <RankingData />

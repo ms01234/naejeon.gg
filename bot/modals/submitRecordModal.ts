@@ -4,6 +4,7 @@ import {
   type ModalSubmitInteraction,
 } from "discord.js";
 import { finalizeDraftMatch } from "../actions/matches";
+import { requestRankingPageRevalidate } from "../lib/revalidateRanking";
 import { isDraftComplete, upsertTeamDraft } from "../actions/drafts";
 import {
   buildRecordPanelDisabledRow,
@@ -155,6 +156,8 @@ export async function handleRecordModalSubmit(
           await safeReply(interaction, `저장 실패: ${result.message}`);
           return true;
         }
+
+        void requestRankingPageRevalidate();
 
         const panelContent =
           `✅ 매치가 저장되었습니다. (\`${result.matchId}\`)\n` +

@@ -1,12 +1,11 @@
-import { unstable_cache } from "next/cache";
 import { hallOfFameNicknameKey } from "@/lib/hall-of-fame";
 import { normalizeTeamSide } from "@/lib/team";
 import { createPublicSupabaseClient } from "@/lib/supabaseClient";
 
-/** KDA·챔피언 폭 랭킹 최소 판수 */
-const MIN_GAMES_KDA_POOL = 3;
-/** 승률 랭킹만 더 엄격하게 */
-const MIN_GAMES_WIN_RATE = 5;
+/** 승률 랭킹 최소 완료 매치 판수 */
+const MIN_GAMES_WIN_RATE = 9;
+/** KDA 랭킹 최소 완료 매치 판수 */
+const MIN_GAMES_KDA_RANK = 5;
 
 type PartRow = {
   match_id: unknown;
@@ -21,6 +20,7 @@ type PartRow = {
 type MatchRow = {
   id: unknown;
   winner: string | null;
+  created_at?: string | null;
 };
 
 function num(v: unknown): number {
@@ -46,8 +46,27 @@ type Agg = {
   kills: number;
   deaths: number;
   assists: number;
-  champions: Set<string>;
+  champGames: Map<string, number>;
+  champLastWinAt: Map<string, string>;
 };
+
+function pickShowcaseChampion(agg: Agg): string {
+  let best = "";
+  let bestGames = -1;
+  let bestLast = "";
+  for (const [ch, games] of agg.champGames) {
+    const last = agg.champLastWinAt.get(ch) ?? "";
+    if (
+      games > bestGames ||
+      (games === bestGames && last.localeCompare(bestLast) > 0)
+    ) {
+      bestGames = games;
+      bestLast = last;
+      best = ch;
+    }
+  }
+  return best;
+}
 
 async function fetchAllRows<T>(
   table: "matches" | "match_participants",
@@ -76,12 +95,18 @@ function aggregateFromCompleteMatches(
   mRes: MatchRow[],
   pRes: PartRow[],
 ): Map<string, Agg> {
-  const winByMatch = new Map<string, "blue" | "red">();
+  const winByMatch = new Map<
+    string,
+    { winner: "blue" | "red"; created_at: string }
+  >();
   for (const m of mRes) {
     const k = matchJoinKey(m.id);
     const w = normalizeTeamSide(m.winner);
     if (k == null || w == null) continue;
-    winByMatch.set(k, w);
+    winByMatch.set(k, {
+      winner: w,
+      created_at: m.created_at ?? "",
+    });
   }
 
   const partsByMatch = new Map<string, PartRow[]>();
@@ -106,7 +131,7 @@ function aggregateFromCompleteMatches(
   const byNick = new Map<string, Agg>();
 
   for (const mk of completeMatchIds) {
-    const winner = winByMatch.get(mk)!;
+    const meta = winByMatch.get(mk)!;
     const list = partsByMatch.get(mk) ?? [];
     for (const p of list) {
       const nickKey = hallOfFameNicknameKey(String(p.nickname ?? ""));
@@ -123,19 +148,27 @@ function aggregateFromCompleteMatches(
           kills: 0,
           deaths: 0,
           assists: 0,
-          champions: new Set(),
+          champGames: new Map(),
+          champLastWinAt: new Map(),
         };
         byNick.set(nickKey, agg);
       }
 
-      const ch = (p.champion ?? "").trim();
-      if (ch) agg.champions.add(ch);
-
+      const ch = (p.champion ?? "").trim() || "—";
       agg.games += 1;
       agg.kills += Number(p.kills ?? 0);
       agg.deaths += Number(p.deaths ?? 0);
       agg.assists += Number(p.assists ?? 0);
-      if (winner === team) agg.wins += 1;
+      agg.champGames.set(ch, (agg.champGames.get(ch) ?? 0) + 1);
+
+      const won = meta.winner === team;
+      if (won) {
+        agg.wins += 1;
+        const prev = agg.champLastWinAt.get(ch) ?? "";
+        if (meta.created_at.localeCompare(prev) > 0) {
+          agg.champLastWinAt.set(ch, meta.created_at);
+        }
+      }
     }
   }
 
@@ -150,37 +183,35 @@ export type WinRateRankEntry = {
   losses: number;
   /** 표시용 % (소수 첫째) */
   winRatePercent: number;
+  /** 명예의 전당 카드용 (K+A)/max(D,1) */
+  avgKda: number;
+  /** 대표 챔피언(썸네일) */
+  showcaseChampion: string;
 };
 
 export type KdaRankEntry = {
   rank: number;
   nickname: string;
   games: number;
+  wins: number;
   kills: number;
   deaths: number;
   assists: number;
   perfect: boolean;
   /** perfect 가 아닐 때 (K+A)/D */
   kdaValue: number;
-};
-
-export type AllRounderRankEntry = {
-  rank: number;
-  nickname: string;
-  games: number;
-  uniqueChampionCount: number;
+  showcaseChampion: string;
 };
 
 export type RankingsPayload = {
   winRate: WinRateRankEntry[];
   kda: KdaRankEntry[];
-  allRounder: AllRounderRankEntry[];
 };
 
-async function buildRankingsPayload(): Promise<RankingsPayload | null> {
+export async function getRankingsPayload(): Promise<RankingsPayload | null> {
   try {
     const [mRes, pRes] = await Promise.all([
-      fetchAllRows<MatchRow>("matches", "id, winner"),
+      fetchAllRows<MatchRow>("matches", "id, winner, created_at"),
       fetchAllRows<PartRow>(
         "match_participants",
         "match_id, nickname, team, champion, kills, deaths, assists",
@@ -190,22 +221,25 @@ async function buildRankingsPayload(): Promise<RankingsPayload | null> {
     if (!mRes.ok || !pRes.ok) return null;
 
     const byNick = aggregateFromCompleteMatches(mRes.rows, pRes.rows);
-    const qualifiedKdaPool = [...byNick.values()].filter(
-      (a) => a.games >= MIN_GAMES_KDA_POOL,
+    const qualifiedKda = [...byNick.values()].filter(
+      (a) => a.games >= MIN_GAMES_KDA_RANK,
     );
-    const qualifiedWinRate = qualifiedKdaPool.filter(
+    const qualifiedWin = [...byNick.values()].filter(
       (a) => a.games >= MIN_GAMES_WIN_RATE,
     );
 
-    const winRate = [...qualifiedWinRate]
+    const winRate = qualifiedWin
       .map((a) => {
         const rate = a.games > 0 ? (a.wins / a.games) * 100 : 0;
+        const avgKda = (a.kills + a.assists) / Math.max(a.deaths, 1);
         return {
           nickname: a.displayNickname,
           games: a.games,
           wins: a.wins,
           losses: Math.max(0, a.games - a.wins),
           winRatePercent: Math.round(rate * 10) / 10,
+          avgKda,
+          showcaseChampion: pickShowcaseChampion(a),
           _sortRate: a.games > 0 ? a.wins / a.games : 0,
         };
       })
@@ -221,9 +255,11 @@ async function buildRankingsPayload(): Promise<RankingsPayload | null> {
         wins: r.wins,
         losses: r.losses,
         winRatePercent: r.winRatePercent,
+        avgKda: r.avgKda,
+        showcaseChampion: r.showcaseChampion,
       }));
 
-    const kda = [...qualifiedKdaPool]
+    const kda = qualifiedKda
       .map((a) => {
         const perfect = a.deaths === 0;
         const kdaValue = perfect
@@ -232,11 +268,13 @@ async function buildRankingsPayload(): Promise<RankingsPayload | null> {
         return {
           nickname: a.displayNickname,
           games: a.games,
+          wins: a.wins,
           kills: a.kills,
           deaths: a.deaths,
           assists: a.assists,
           perfect,
           kdaValue,
+          showcaseChampion: pickShowcaseChampion(a),
           _ka: a.kills + a.assists,
         };
       })
@@ -256,39 +294,17 @@ async function buildRankingsPayload(): Promise<RankingsPayload | null> {
         rank: i + 1,
         nickname: r.nickname,
         games: r.games,
+        wins: r.wins,
         kills: r.kills,
         deaths: r.deaths,
         assists: r.assists,
         perfect: r.perfect,
         kdaValue: r.kdaValue,
+        showcaseChampion: r.showcaseChampion,
       }));
 
-    const allRounder = [...qualifiedKdaPool]
-      .map((a) => ({
-        nickname: a.displayNickname,
-        games: a.games,
-        uniqueChampionCount: a.champions.size,
-      }))
-      .sort((A, B) => {
-        if (B.uniqueChampionCount !== A.uniqueChampionCount) {
-          return B.uniqueChampionCount - A.uniqueChampionCount;
-        }
-        if (B.games !== A.games) return B.games - A.games;
-        return A.nickname.localeCompare(B.nickname, "ko");
-      })
-      .map((r, i) => ({
-        rank: i + 1,
-        nickname: r.nickname,
-        games: r.games,
-        uniqueChampionCount: r.uniqueChampionCount,
-      }));
-
-    return { winRate, kda, allRounder };
+    return { winRate, kda };
   } catch {
     return null;
   }
 }
-
-export const getRankingsPayload = unstable_cache(buildRankingsPayload, ["rankings-payload-v2"], {
-  revalidate: 3600,
-});
