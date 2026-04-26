@@ -197,6 +197,8 @@ function WinRankingBody({
               wins={e.wins}
               winRatePercent={e.winRatePercent}
               avgKda={e.avgKda}
+              rankingCardVariant="win-top"
+              losses={e.losses}
             />
           </li>
         ))}
@@ -241,6 +243,13 @@ function KdaRankingBody({
                 winRatePercent={winPct}
                 avgKda={cardKda}
                 statEmphasis="kda"
+                rankingCardVariant="kda-top"
+                kdaTotals={{
+                  kills: e.kills,
+                  deaths: e.deaths,
+                  assists: e.assists,
+                  games: e.games,
+                }}
               />
             </li>
           );
