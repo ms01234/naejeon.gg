@@ -30,8 +30,8 @@ export default function RankingPage() {
           종합 랭킹
         </h1>
         <p className="mb-8 text-sm text-[var(--op-muted)]">
-          승률과 KDA를 나란히 확인할 수 있습니다. 새 전적이 확정되면 이 페이지가 곧바로
-          갱신됩니다.
+          상단에서 보기 모드를 선택하세요. 새 전적이 확정되면 서버에서 페이지가 갱신될 때
+          최신 순위가 반영됩니다.
         </p>
         <Suspense fallback={<RankingPageSkeleton />}>
           <RankingData />
