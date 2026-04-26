@@ -25,14 +25,10 @@ async function RankingData() {
 export default function RankingPage() {
   return (
     <div className="min-h-screen bg-[var(--op-page)]">
-      <div className="mx-auto max-w-6xl px-4 pb-16 pt-8 sm:pt-10">
-        <h1 className="mb-2 text-2xl font-bold tracking-tight text-[var(--op-text)]">
+      <div className="mx-auto max-w-3xl px-4 pb-16 pt-4 sm:pt-5">
+        <h1 className="mb-6 text-2xl font-bold tracking-tight text-[var(--op-text)]">
           종합 랭킹
         </h1>
-        <p className="mb-8 text-sm text-[var(--op-muted)]">
-          상단에서 보기 모드를 선택하세요. 새 전적이 확정되면 서버에서 페이지가 갱신될 때
-          최신 순위가 반영됩니다.
-        </p>
         <Suspense fallback={<RankingPageSkeleton />}>
           <RankingData />
         </Suspense>

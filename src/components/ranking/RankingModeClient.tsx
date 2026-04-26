@@ -259,9 +259,9 @@ export function RankingModeClient({
   const [mode, setMode] = useState<Mode>("win");
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div
-        className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+        className="grid grid-cols-2 gap-2"
         role="tablist"
         aria-label="랭킹 종류 선택"
       >
@@ -271,22 +271,19 @@ export function RankingModeClient({
           aria-selected={mode === "win"}
           onClick={() => setMode("win")}
           className={[
-            "flex min-h-[5.5rem] flex-col items-center justify-center gap-2 rounded-xl border-2 bg-[var(--op-panel)] px-4 py-5 text-center transition-all duration-200 sm:min-h-[6.25rem]",
+            "flex items-center justify-center gap-2 rounded-lg border-2 bg-[var(--op-panel)] px-3 py-2.5 text-center transition-all duration-200 sm:gap-2.5 sm:rounded-xl sm:px-4 sm:py-2.5",
             mode === "win"
               ? ACTIVE_BORDER
               : "border-white/[0.08] hover:border-white/15 hover:bg-white/[0.03]",
           ].join(" ")}
         >
           <Percent
-            className="size-8 shrink-0 text-[#5CAAFF] sm:size-9"
+            className="size-4 shrink-0 text-[#5CAAFF] sm:size-[1.05rem]"
             strokeWidth={2}
             aria-hidden
           />
-          <span className="text-base font-bold tracking-tight text-[var(--op-text)] sm:text-lg">
+          <span className="text-sm font-semibold tracking-tight text-[var(--op-text)]">
             승률 랭킹
-          </span>
-          <span className="text-[11px] text-[var(--op-muted)] sm:text-xs">
-            9판 이상 집계
           </span>
         </button>
 
@@ -296,22 +293,19 @@ export function RankingModeClient({
           aria-selected={mode === "kda"}
           onClick={() => setMode("kda")}
           className={[
-            "flex min-h-[5.5rem] flex-col items-center justify-center gap-2 rounded-xl border-2 bg-[var(--op-panel)] px-4 py-5 text-center transition-all duration-200 sm:min-h-[6.25rem]",
+            "flex items-center justify-center gap-2 rounded-lg border-2 bg-[var(--op-panel)] px-3 py-2.5 text-center transition-all duration-200 sm:gap-2.5 sm:rounded-xl sm:px-4 sm:py-2.5",
             mode === "kda"
               ? ACTIVE_BORDER
               : "border-white/[0.08] hover:border-white/15 hover:bg-white/[0.03]",
           ].join(" ")}
         >
           <Crosshair
-            className="size-8 shrink-0 text-[#00E2A7] sm:size-9"
+            className="size-4 shrink-0 text-[#00E2A7] sm:size-[1.05rem]"
             strokeWidth={2}
             aria-hidden
           />
-          <span className="text-base font-bold tracking-tight text-[var(--op-text)] sm:text-lg">
+          <span className="text-sm font-semibold tracking-tight text-[var(--op-text)]">
             KDA 랭킹
-          </span>
-          <span className="text-[11px] text-[var(--op-muted)] sm:text-xs">
-            5판 이상 집계
           </span>
         </button>
       </div>

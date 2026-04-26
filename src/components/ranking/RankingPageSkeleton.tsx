@@ -1,11 +1,10 @@
-/** Suspense fallback — 모드 선택 상자 + 랭킹 골격 */
+/** Suspense fallback — 모드 탭 + 랭킹 골격 */
 export function RankingPageSkeleton() {
   return (
-    <div className="animate-pulse space-y-6" aria-busy="true" aria-label="랭킹 불러오는 중">
-      <div className="h-4 w-full max-w-2xl rounded bg-white/10" />
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div className="h-28 rounded-xl border-2 border-white/10 bg-[var(--op-panel)] sm:h-32" />
-        <div className="h-28 rounded-xl border-2 border-white/10 bg-[var(--op-panel)] sm:h-32" />
+    <div className="animate-pulse space-y-4" aria-busy="true" aria-label="랭킹 불러오는 중">
+      <div className="grid grid-cols-2 gap-2">
+        <div className="h-11 rounded-lg border-2 border-white/10 bg-[var(--op-panel)] sm:h-11 sm:rounded-xl" />
+        <div className="h-11 rounded-lg border-2 border-white/10 bg-[var(--op-panel)] sm:h-11 sm:rounded-xl" />
       </div>
       <div className="flex flex-col gap-3">
         {Array.from({ length: 3 }).map((_, i) => (
