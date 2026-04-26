@@ -1,4 +1,5 @@
 import { playerProfileCardClass } from "@/lib/hall-of-fame-ui";
+import { kdaDisplayTextColorHex } from "@/lib/player-kda-color";
 import { HallOfFameRankBadge } from "@/components/player/HallOfFameRankBadge";
 
 type HofRank = 1 | 2 | 3;
@@ -52,7 +53,18 @@ export function PlayerProfileHeader({
           </strong>
           {" · "}
           KDA{" "}
-          <strong className="tabular-nums text-[var(--op-text)]">
+          <strong
+            className={
+              Number.isFinite(overallKda)
+                ? "tabular-nums"
+                : "tabular-nums text-[var(--op-muted)]"
+            }
+            style={
+              Number.isFinite(overallKda)
+                ? { color: kdaDisplayTextColorHex(overallKda) }
+                : undefined
+            }
+          >
             {Number.isFinite(overallKda) ? overallKda.toFixed(2) : "—"}
           </strong>
         </span>

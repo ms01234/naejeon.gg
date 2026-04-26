@@ -3,6 +3,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { aggregateChampionStats } from "@/lib/match-stats";
 import type { PlayerStatRow } from "@/lib/match-stats";
+import { kdaDisplayTextColorHex } from "@/lib/player-kda-color";
 import type { ChampionAggregate } from "@/types/match";
 import {
   LANE_IDS,
@@ -152,7 +153,10 @@ function ChampionRow({
             </span>
             <span className="mx-1 text-white/25">·</span>
             KDA{" "}
-            <span className="font-semibold tabular-nums text-[var(--op-text)]">
+            <span
+              className="font-semibold tabular-nums"
+              style={{ color: kdaDisplayTextColorHex(c.avg_kda) }}
+            >
               {c.avg_kda.toFixed(2)}
             </span>
           </p>
