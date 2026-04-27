@@ -1,6 +1,5 @@
 /**
- * 전적 입력(봇) → DB에 저장될 소환사 닉네임.
- * `src/lib/participant-nickname-canonical.ts` 와 규칙 동기화 유지.
+ * DB·검색에 쓰이는 정식 닉네임으로 통일 (봇 `resolveCanonicalParticipantNickname` 과 동일 규칙 유지).
  */
 export function resolveCanonicalParticipantNickname(raw: string): string {
   const t = raw.trim();
