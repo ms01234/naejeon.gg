@@ -52,7 +52,7 @@ export type HallOfFameEntryCardProps = {
   /**
    * 랭킹 Top3: 메인 수치 옆에 상세를 한 줄로 붙임.
    * `win-top`일 때 `losses` 필요(승률 % (N승 N패)).
-   * `kda-top`일 때 `kdaTotals` 필요(KDA (평균 K/D/A)).
+   * `kda-top`일 때 `kdaTotals` 필요 — 괄호 안은 리스트와 동일한 누적 K/D/A.
    */
   rankingCardVariant?: "none" | "win-top" | "kda-top";
   losses?: number;
@@ -67,17 +67,28 @@ export type HallOfFameEntryCardProps = {
 const hofPlainStatStrongClass =
   "text-xs font-medium tabular-nums text-[color:var(--hof-charcoal)] sm:text-[13px]";
 
-function formatAvgKdaPerGame(t: {
+/** 홈 명예의 전당과 동일 계열 — 강조 수치(승·승률 등) */
+const hofAccentStatMainClass =
+  "text-xs font-bold tabular-nums sm:text-[13px]";
+
+/** 랭킹 승률 Top3: 메인 승률 줄을 한 단계 키워 승패와 균형 */
+const rankingWinRateMainClass =
+  "text-sm font-bold tabular-nums sm:text-[15px]";
+
+/** 랭킹 KDA Top3: 메인 KDA 수치 — 홈 강조보다 한 단계 크게 */
+const rankingKdaMainValueClass =
+  "text-[15px] font-bold tabular-nums leading-none sm:text-[1.0625rem]";
+
+/** 랭킹 KDA Top3: 괄호 안 누적 K/D/A (4등 이하 표와 동일 의미) */
+const rankingKdaTotalsParenClass =
+  "text-xs font-bold tabular-nums sm:text-[13px]";
+
+function formatTotalKdaSlash(t: {
   kills: number;
   deaths: number;
   assists: number;
-  games: number;
 }): string {
-  const g = Math.max(t.games, 1);
-  const k = t.kills / g;
-  const d = t.deaths / g;
-  const a = t.assists / g;
-  return `${k.toFixed(1)} / ${d.toFixed(1)} / ${a.toFixed(1)}`;
+  return `${t.kills}/${t.deaths}/${t.assists}`;
 }
 
 export function HallOfFameEntryCard({
@@ -143,20 +154,25 @@ export function HallOfFameEntryCard({
             {nickname}
           </Link>
         </div>
-        <div className="mt-1.5 flex flex-wrap items-baseline gap-x-4 gap-y-1 text-[10px] font-normal tabular-nums text-[color:var(--hof-muted)] sm:text-[11px]">
+        <div
+          className={[
+            "mt-1.5 flex flex-wrap items-baseline font-normal tabular-nums text-[color:var(--hof-muted)]",
+            winTop || kdaTop
+              ? "gap-x-3 gap-y-1.5 text-[10px] sm:gap-x-4 sm:text-[11px]"
+              : "gap-x-4 gap-y-1 text-[10px] sm:text-[11px]",
+          ].join(" ")}
+        >
           {winTop ? (
             <>
-              <span>
+              <span className="min-w-0">
                 승률{" "}
-                <strong
-                  className={`text-xs font-bold tabular-nums sm:text-[13px] ${accent} ${glow}`}
-                >
+                <strong className={`${rankingWinRateMainClass} ${accent} ${glow}`}>
                   {winRatePercent.toFixed(1)}% ({wins}승 {losses}패)
                 </strong>
               </span>
-              <span>
+              <span className="min-w-0">
                 평균 KDA{" "}
-                <strong className="font-medium text-[color:var(--hof-charcoal)]">
+                <strong className="text-xs font-medium tabular-nums text-[color:var(--hof-charcoal)] sm:text-[13px]">
                   {formatHallOfFameKda(avgKda)}
                 </strong>
               </span>
@@ -167,18 +183,25 @@ export function HallOfFameEntryCard({
                 승리{" "}
                 <strong className={hofPlainStatStrongClass}>{wins}</strong>
                 <span className="font-medium"> 회</span>
-                <span className="mx-1.5 text-[color:var(--hof-muted)]/80">·</span>
+                <span className="mx-1 text-[color:var(--hof-muted)]/80 sm:mx-1.5">
+                  ·
+                </span>
                 승률{" "}
                 <strong className={hofPlainStatStrongClass}>
                   {winRatePercent.toFixed(1)}%
                 </strong>
               </span>
               <span className="min-w-0">
-                평균 KDA{" "}
+                <span className="text-[10px] sm:text-[11px]">평균 KDA </span>
                 <strong
-                  className={`text-xs font-bold tabular-nums sm:text-[13px] ${accent} ${glow}`}
+                  className={`inline-flex flex-wrap items-baseline gap-x-1 tabular-nums ${accent} ${glow}`}
                 >
-                  {`${formatHallOfFameKda(avgKda)} (${formatAvgKdaPerGame(kdaTotals)})`}
+                  <span className={rankingKdaMainValueClass}>
+                    {formatHallOfFameKda(avgKda)}
+                  </span>
+                  <span className={`${rankingKdaTotalsParenClass} shrink-0`}>
+                    ({formatTotalKdaSlash(kdaTotals)})
+                  </span>
                 </strong>
               </span>
             </>
@@ -190,7 +213,7 @@ export function HallOfFameEntryCard({
                   className={
                     emphasizeKda
                       ? hofPlainStatStrongClass
-                      : `text-xs font-bold tabular-nums sm:text-[13px] ${accent} ${glow}`
+                      : `${hofAccentStatMainClass} ${accent} ${glow}`
                   }
                 >
                   {wins}
@@ -203,7 +226,7 @@ export function HallOfFameEntryCard({
                   className={
                     emphasizeKda
                       ? hofPlainStatStrongClass
-                      : `text-xs font-bold tabular-nums sm:text-[13px] ${accent} ${glow}`
+                      : `${hofAccentStatMainClass} ${accent} ${glow}`
                   }
                 >
                   {winRatePercent.toFixed(1)}%
@@ -214,7 +237,7 @@ export function HallOfFameEntryCard({
                 <strong
                   className={
                     emphasizeKda
-                      ? `text-xs font-bold tabular-nums sm:text-[13px] ${accent} ${glow}`
+                      ? `${hofAccentStatMainClass} ${accent} ${glow}`
                       : "font-medium text-[color:var(--hof-charcoal)]"
                   }
                 >

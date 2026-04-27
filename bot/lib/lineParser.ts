@@ -1,4 +1,5 @@
 import type { DraftRow } from "../types/draft";
+import { resolveCanonicalParticipantNickname } from "./participantNickname";
 
 const TEAM_FIELD_ID = "TEAM_BLOCK";
 
@@ -51,10 +52,11 @@ export function parseNickChampionSlashLine(
   }
 
   const slashIdx = line.indexOf("/");
-  const nickname = line.slice(0, slashIdx).trim();
+  const nicknameRaw = line.slice(0, slashIdx).trim();
+  const nickname = resolveCanonicalParticipantNickname(nicknameRaw);
   const rest = line.slice(slashIdx + 1).trim();
 
-  if (!nickname || !rest) {
+  if (!nicknameRaw || !rest) {
     return structuralError(lineNo);
   }
 
