@@ -7,7 +7,13 @@ import { buildMatchesPageHref, parseLaneQueryParam } from "@/lib/match-history-f
 import { resolveCanonicalParticipantNickname } from "@/lib/participant-nickname-canonical";
 
 const selectBaseClass =
-  "min-h-11 min-w-[11rem] cursor-pointer appearance-none rounded-lg border-2 border-white/[0.08] bg-[var(--op-panel)] bg-[length:1rem] bg-[right_0.65rem_center] bg-no-repeat py-2 pl-3 pr-9 text-sm font-semibold text-[var(--op-text)] outline-none transition focus:border-[#5CAAFF]/80 focus:ring-2 focus:ring-[#5CAAFF]/35";
+  "h-11 min-w-[11rem] box-border cursor-pointer appearance-none rounded-lg border-2 bg-[length:1rem] bg-[right_0.65rem_center] bg-no-repeat px-3 py-0 pr-9 text-sm font-semibold outline-none transition";
+
+const selectEnabledClass =
+  `${selectBaseClass} border-white/[0.08] bg-[var(--op-panel)] text-[var(--op-text)] focus:border-[#5CAAFF]/80 focus:ring-2 focus:ring-[#5CAAFF]/35`;
+
+const selectDisabledClass =
+  `${selectBaseClass} cursor-not-allowed border-white/[0.06] bg-black/25 text-[var(--op-muted)] opacity-55 shadow-none`;
 
 /** Chevron 다크용 (svg data URL) */
 const SELECT_CHEVRON =
@@ -25,6 +31,7 @@ export function MatchesFilterBar({
 
   const laneFromUrl = parseLaneQueryParam(sp.get("lane") ?? undefined);
   const qFromUrl = sp.get("q") ?? "";
+  const laneSelectEnabled = qFromUrl.trim().length > 0;
 
   const [draft, setDraft] = useState(initialQuery);
   const [searchFocused, setSearchFocused] = useState(false);
@@ -54,7 +61,8 @@ export function MatchesFilterBar({
 
   const submitSearch = useCallback(() => {
     const canon = resolveCanonicalParticipantNickname(draft).trim();
-    navigateWithFilters(canon, laneFromUrl, 1);
+    const lane = canon ? laneFromUrl : "ALL";
+    navigateWithFilters(canon, lane, 1);
     setDraft(canon);
   }, [draft, laneFromUrl, navigateWithFilters]);
 
@@ -123,35 +131,8 @@ export function MatchesFilterBar({
     suggestions.length > 0;
 
   return (
-    <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-      <div className="flex shrink-0 flex-col gap-1.5">
-        <label
-          htmlFor="matches-lane-filter"
-          className="text-[11px] font-medium uppercase tracking-wide text-[var(--op-muted)]"
-        >
-          라인
-        </label>
-        <select
-          id="matches-lane-filter"
-          value={laneFromUrl === "ALL" ? "ALL" : laneFromUrl}
-          onChange={(e) => {
-            const v = e.target.value;
-            onLaneChange(v === "ALL" ? "ALL" : (v as LaneTab));
-          }}
-          style={{ backgroundImage: SELECT_CHEVRON }}
-          className={selectBaseClass}
-          aria-label="라인 필터"
-        >
-          <option value="ALL">전체</option>
-          {LANE_IDS.map((id: LaneId) => (
-            <option key={id} value={id}>
-              {LANE_LABEL_KO[id]}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="relative w-full sm:max-w-[min(100%,20rem)]">
+    <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+      <div className="relative min-w-0 flex-1 sm:max-w-[min(100%,20rem)]">
         <label className="sr-only" htmlFor="matches-player-search">
           소환사 이름 검색
         </label>
@@ -166,7 +147,7 @@ export function MatchesFilterBar({
           onFocus={onSearchFocus}
           onBlur={onSearchBlur}
           autoComplete="off"
-          className="min-h-11 w-full rounded-lg border-2 border-white/[0.08] bg-[var(--op-panel)] px-3 py-2 text-sm text-[var(--op-text)] placeholder:text-[var(--op-muted)] outline-none ring-[var(--op-accent)] transition focus:border-[#5CAAFF]/80 focus:ring-2 focus:ring-[#5CAAFF]/35"
+          className="h-11 w-full box-border rounded-lg border-2 border-white/[0.08] bg-[var(--op-panel)] px-3 py-2 text-sm leading-snug text-[var(--op-text)] placeholder:text-[var(--op-muted)] outline-none ring-[var(--op-accent)] transition focus:border-[#5CAAFF]/80 focus:ring-2 focus:ring-[#5CAAFF]/35"
         />
 
         {showSuggestions ? (
@@ -190,6 +171,38 @@ export function MatchesFilterBar({
             ))}
           </ul>
         ) : null}
+      </div>
+
+      <div className="shrink-0">
+        <select
+          id="matches-lane-filter"
+          disabled={!laneSelectEnabled}
+          value={laneFromUrl === "ALL" ? "ALL" : laneFromUrl}
+          onChange={(e) => {
+            const v = e.target.value;
+            onLaneChange(v === "ALL" ? "ALL" : (v as LaneTab));
+          }}
+          style={{
+            backgroundImage: laneSelectEnabled ? SELECT_CHEVRON : undefined,
+          }}
+          className={
+            laneSelectEnabled ? selectEnabledClass : selectDisabledClass
+          }
+          aria-label="라인 필터"
+          aria-disabled={!laneSelectEnabled}
+          title={
+            laneSelectEnabled
+              ? undefined
+              : "소환사 이름을 검색한 뒤 라인을 선택할 수 있습니다."
+          }
+        >
+          <option value="ALL">전체</option>
+          {LANE_IDS.map((id: LaneId) => (
+            <option key={id} value={id}>
+              {LANE_LABEL_KO[id]}
+            </option>
+          ))}
+        </select>
       </div>
     </div>
   );
