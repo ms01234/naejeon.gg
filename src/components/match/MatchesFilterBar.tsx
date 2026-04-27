@@ -7,7 +7,7 @@ import { buildMatchesPageHref, parseLaneQueryParam } from "@/lib/match-history-f
 import { resolveCanonicalParticipantNickname } from "@/lib/participant-nickname-canonical";
 
 const selectBaseClass =
-  "h-11 min-w-[11rem] box-border cursor-pointer appearance-none rounded-lg border-2 bg-[length:1rem] bg-[right_0.65rem_center] bg-no-repeat px-3 py-0 pr-9 text-sm font-semibold outline-none transition";
+  "h-11 w-[8.75rem] max-w-[8.75rem] shrink-0 box-border cursor-pointer appearance-none rounded-lg border-2 bg-[length:1rem] bg-[right_0.5rem_center] bg-no-repeat px-2 py-0 pr-8 text-sm font-semibold outline-none transition";
 
 const selectEnabledClass =
   `${selectBaseClass} border-white/[0.08] bg-[var(--op-panel)] text-[var(--op-text)] focus:border-[#5CAAFF]/80 focus:ring-2 focus:ring-[#5CAAFF]/35`;
@@ -31,9 +31,13 @@ export function MatchesFilterBar({
 
   const laneFromUrl = parseLaneQueryParam(sp.get("lane") ?? undefined);
   const qFromUrl = sp.get("q") ?? "";
-  const laneSelectEnabled = qFromUrl.trim().length > 0;
 
   const [draft, setDraft] = useState(initialQuery);
+
+  /** URL 확정 검색어와 입력창 값이 모두 있을 때만 라인 선택 가능 */
+  const laneSelectEnabled =
+    qFromUrl.trim().length > 0 && draft.trim().length > 0;
+
   const [searchFocused, setSearchFocused] = useState(false);
   const blurTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -54,9 +58,10 @@ export function MatchesFilterBar({
     [router],
   );
 
-  /** 라인만 바꿀 때는 확정된 검색어(URL q) 유지 — Enter 검색만 q 갱신 */
+  /** 라인 변경 시 현재 입력값 기준으로 URL 동기화 (활성일 때만 호출됨) */
   const onLaneChange = (lane: LaneTab) => {
-    navigateWithFilters(qFromUrl.trim(), lane, 1);
+    const q = resolveCanonicalParticipantNickname(draft).trim();
+    navigateWithFilters(q, lane, 1);
   };
 
   const submitSearch = useCallback(() => {
@@ -130,9 +135,17 @@ export function MatchesFilterBar({
     draft.trim().length > 0 &&
     suggestions.length > 0;
 
+  const laneDisableTitle = laneSelectEnabled
+    ? undefined
+    : !draft.trim().length
+      ? "검색창에 이름을 입력해 주세요."
+      : !qFromUrl.trim().length
+        ? "Enter 키로 검색을 확정하면 라인을 선택할 수 있습니다."
+        : undefined;
+
   return (
-    <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-      <div className="relative min-w-0 flex-1 sm:max-w-[min(100%,20rem)]">
+    <div className="mb-8 flex w-full flex-col items-end gap-3 sm:flex-row sm:items-center sm:justify-end sm:gap-3">
+      <div className="relative w-full max-w-[min(100%,18rem)]">
         <label className="sr-only" htmlFor="matches-player-search">
           소환사 이름 검색
         </label>
@@ -190,11 +203,7 @@ export function MatchesFilterBar({
           }
           aria-label="라인 필터"
           aria-disabled={!laneSelectEnabled}
-          title={
-            laneSelectEnabled
-              ? undefined
-              : "소환사 이름을 검색한 뒤 라인을 선택할 수 있습니다."
-          }
+          title={laneDisableTitle}
         >
           <option value="ALL">전체</option>
           {LANE_IDS.map((id: LaneId) => (
