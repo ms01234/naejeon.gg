@@ -1,4 +1,9 @@
 import { championIconUrlByName } from "@/lib/ddragon";
+import {
+  matchPassesFilters,
+  sortMatchParticipants,
+} from "@/lib/match-history-filters";
+import type { LaneTab } from "@/lib/lane";
 import { createPublicSupabaseClient } from "@/lib/supabaseClient";
 import type {
   MatchCardUi,
@@ -25,13 +30,6 @@ function matchJoinKey(v: unknown): string | null {
   const n = num(v);
   if (!Number.isFinite(n)) return null;
   return String(Math.trunc(n));
-}
-
-function sortParticipants(list: MatchParticipantRow[]) {
-  return [...list].sort((a, b) => {
-    if (a.team !== b.team) return a.team === "blue" ? -1 : 1;
-    return a.id - b.id;
-  });
 }
 
 async function attachIcons(
@@ -91,7 +89,16 @@ export type FetchRecentCompleteMatchesInput =
   /** 홈: 완료 매치만 풀에서 뽑아 상위 limit개 */
   | { mode: "recent"; limit: number }
   /** 전적 페이지: matches 테이블 기준 range 페이지네이션 */
-  | { mode: "page"; page: number; pageSize: number };
+  | { mode: "page"; page: number; pageSize: number }
+  /** 전적 페이지 필터: 최근 N건 중 조건에 맞는 매치만 (검색·라인) */
+  | {
+      mode: "filterPage";
+      page: number;
+      pageSize: number;
+      playerQuery: string;
+      lane: LaneTab;
+      poolLimit?: number;
+    };
 
 export type FetchRecentCompleteMatchesResult =
   | { ok: true; matches: MatchWithParticipants[]; totalCount: number }
@@ -154,9 +161,9 @@ export async function fetchRecentCompleteMatches(
 ): Promise<FetchRecentCompleteMatchesResult> {
   try {
     const supabase = createPublicSupabaseClient();
-    const totalCount = (await countMatches(supabase)) ?? 0;
 
     if (input.mode === "recent") {
+      const totalCount = (await countMatches(supabase)) ?? 0;
       const limit = Math.max(1, input.limit);
       const pool = Math.max(limit * 4, 20);
 
@@ -178,6 +185,38 @@ export async function fetchRecentCompleteMatches(
       return { ok: true, matches: complete, totalCount };
     }
 
+    if (input.mode === "filterPage") {
+      const page = Math.max(1, input.page);
+      const pageSize = Math.min(100, Math.max(1, input.pageSize));
+      const poolLimit = Math.min(
+        10_000,
+        Math.max(50, input.poolLimit ?? 4000),
+      );
+
+      const { data: matchRows, error: mErr } = await supabase
+        .from("matches")
+        .select("id, guild_id, winner, duration_seconds, created_at")
+        .order("created_at", { ascending: false })
+        .limit(poolLimit);
+
+      if (mErr) return { ok: false, message: mErr.message };
+
+      const matchBases = (matchRows ?? [])
+        .map((r) => rowToMatch(r as Record<string, unknown>))
+        .filter((m) => Number.isFinite(m.id) && m.id > 0);
+
+      const merged = await buildMergedWithParticipants(supabase, matchBases);
+      const complete = merged.filter(isCompleteMatch);
+      const filtered = complete.filter((m) =>
+        matchPassesFilters(m, input.playerQuery, input.lane),
+      );
+      const totalCount = filtered.length;
+      const from = (page - 1) * pageSize;
+      const matches = filtered.slice(from, from + pageSize);
+      return { ok: true, matches, totalCount };
+    }
+
+    const totalCount = (await countMatches(supabase)) ?? 0;
     const page = Math.max(1, input.page);
     const pageSize = Math.min(100, Math.max(1, input.pageSize));
     const from = (page - 1) * pageSize;
@@ -206,7 +245,7 @@ export async function fetchRecentCompleteMatches(
 }
 
 export async function toMatchCardUi(m: MatchWithParticipants): Promise<MatchCardUi> {
-  const sorted = sortParticipants(m.match_participants ?? []);
+  const sorted = sortMatchParticipants(m.match_participants ?? []);
   const blue = sorted.filter((p) => p.team === "blue");
   const red = sorted.filter((p) => p.team === "red");
   const [blueUi, redUi] = await Promise.all([

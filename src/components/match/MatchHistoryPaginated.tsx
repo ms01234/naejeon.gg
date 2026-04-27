@@ -2,6 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { MatchCard } from "@/components/match/MatchCard";
 import { RecentMatchesFetchedLog } from "@/components/match/RecentMatchesFetchedLog";
+import type { LaneTab } from "@/lib/lane";
+import { buildMatchesPageHref } from "@/lib/match-history-filters";
 import {
   fetchRecentCompleteMatches,
   toMatchCardUi,
@@ -9,19 +11,48 @@ import {
 
 const PAGE_SIZE = 10;
 
-type Props = { page: number };
+type Props = {
+  page: number;
+  playerQuery: string;
+  lane: LaneTab;
+};
 
-export async function MatchHistoryPaginated({ page }: Props) {
-  const matchRes = await fetchRecentCompleteMatches({
-    mode: "page",
-    page,
-    pageSize: PAGE_SIZE,
-  });
+export async function MatchHistoryPaginated({
+  page,
+  playerQuery,
+  lane,
+}: Props) {
+  const filtersActive =
+    playerQuery.trim().length > 0 || lane !== "ALL";
 
-  if (matchRes.ok && matchRes.totalCount > 0) {
-    const totalPages = Math.max(1, Math.ceil(matchRes.totalCount / PAGE_SIZE));
-    if (page > totalPages) {
-      redirect(`/matches?page=${totalPages}`);
+  const matchRes = filtersActive
+    ? await fetchRecentCompleteMatches({
+        mode: "filterPage",
+        page,
+        pageSize: PAGE_SIZE,
+        playerQuery,
+        lane,
+      })
+    : await fetchRecentCompleteMatches({
+        mode: "page",
+        page,
+        pageSize: PAGE_SIZE,
+      });
+
+  const queryOpts = { q: playerQuery, lane };
+
+  if (matchRes.ok) {
+    if (matchRes.totalCount === 0 && page > 1) {
+      redirect(buildMatchesPageHref(1, queryOpts));
+    }
+    if (matchRes.totalCount > 0) {
+      const totalPages = Math.max(
+        1,
+        Math.ceil(matchRes.totalCount / PAGE_SIZE),
+      );
+      if (page > totalPages) {
+        redirect(buildMatchesPageHref(totalPages, queryOpts));
+      }
     }
   }
 
@@ -30,6 +61,7 @@ export async function MatchHistoryPaginated({ page }: Props) {
       ? {
           ok: true as const,
           mode: "paginated" as const,
+          filtered: filtersActive,
           page,
           pageSize: PAGE_SIZE,
           matchCount: matchRes.matches.length,
@@ -71,10 +103,17 @@ export async function MatchHistoryPaginated({ page }: Props) {
     return (
       <>
         <RecentMatchesFetchedLog data={clientLogPayload} />
-        <div className="rounded-xl border-0 bg-[var(--op-panel)] px-6 py-14 text-center shadow-inner shadow-black/20">
-          <p className="text-sm text-[var(--op-muted)]">
-            아직 표시할 전적이 없습니다.
+        <div className="rounded-xl border border-white/[0.07] bg-[var(--op-panel)] px-8 py-16 text-center shadow-inner shadow-black/25">
+          <p className="text-[15px] font-semibold text-[var(--op-text)]">
+            {filtersActive
+              ? "해당 유저의 전적이 없습니다."
+              : "아직 표시할 전적이 없습니다."}
           </p>
+          {filtersActive ? (
+            <p className="mt-3 max-w-md mx-auto text-sm leading-relaxed text-[var(--op-muted)]">
+              검색어·라인 조건을 바꿔 보거나 필터를 초기화해 보세요.
+            </p>
+          ) : null}
         </div>
       </>
     );
@@ -94,6 +133,8 @@ export async function MatchHistoryPaginated({ page }: Props) {
         page={page}
         totalPages={totalPages}
         totalCount={matchRes.totalCount}
+        playerQuery={playerQuery}
+        lane={lane}
       />
     </>
   );
@@ -103,21 +144,29 @@ function MatchPaginationNav({
   page,
   totalPages,
   totalCount,
+  playerQuery,
+  lane,
 }: {
   page: number;
   totalPages: number;
   totalCount: number;
+  playerQuery: string;
+  lane: LaneTab;
 }) {
+  const queryOpts = { q: playerQuery, lane };
+
   if (totalPages <= 1) {
     return (
-      <p className="mt-8 text-center text-xs text-[var(--op-muted)]">
+      <p className="mt-8 text-center text-xs tabular-nums text-[var(--op-muted)]">
         총 {totalCount.toLocaleString("ko-KR")}경기
       </p>
     );
   }
 
-  const prevHref = page > 1 ? `/matches?page=${page - 1}` : null;
-  const nextHref = page < totalPages ? `/matches?page=${page + 1}` : null;
+  const prevHref =
+    page > 1 ? buildMatchesPageHref(page - 1, queryOpts) : null;
+  const nextHref =
+    page < totalPages ? buildMatchesPageHref(page + 1, queryOpts) : null;
 
   return (
     <nav
