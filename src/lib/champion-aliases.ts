@@ -9,7 +9,8 @@ export const CHAMPION_ALIAS_TO_ID: Record<string, string> = {
   딩거: "Heimerdinger",
   하임: "Heimerdinger",
   문도: "DrMundo",
-  직스: "Jinx",
+  // 직스(Ziggs) / 징크스(Jinx) 혼동 방지: 별칭은 반드시 정확히 매핑
+  직스: "Ziggs",
   케틀: "Katarina",
   케이틀: "Katarina",
   바드: "Bard",

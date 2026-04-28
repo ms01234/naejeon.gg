@@ -50,6 +50,12 @@ function ingestChampions(json: ChampionJson, map: Map<string, string>) {
 /** unstable_cache 직렬화 시 Map → 일반 객체가 되므로 캐시 경계에서는 Record만 사용 */
 type ChampionLookupPayload = { version: string; map: Record<string, string> };
 
+/**
+ * 챔피언 별칭/룩업 캐시 버전.
+ * 별칭 테이블(`CHAMPION_ALIAS_TO_ID`)이 바뀌면 값을 올려서 즉시 캐시를 무효화합니다.
+ */
+const CHAMPION_LOOKUP_CACHE_VERSION = "v2-2026-04-29";
+
 const getChampionLookupMerged = unstable_cache(
   async (): Promise<ChampionLookupPayload> => {
     const version = await getLatestDdragonVersion();
@@ -76,7 +82,7 @@ const getChampionLookupMerged = unstable_cache(
 
     return { version, map: Object.fromEntries(map) };
   },
-  ["ddragon-champion-lookup-merged"],
+  ["ddragon-champion-lookup-merged", CHAMPION_LOOKUP_CACHE_VERSION],
   { revalidate: 86400 },
 );
 
